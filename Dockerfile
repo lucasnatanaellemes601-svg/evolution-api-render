@@ -10,9 +10,9 @@ RUN git clone https://github.com/EvolutionAPI/evolution-api.git /app
 # 4. Nos movemos a la carpeta del proyecto
 WORKDIR /app
 
-# 5. Instalamos dependencias, GENERAMOS PRISMA, y construimos
+# 5. Instalamos, BUSCAMOS el archivo de Prisma automáticamente y construimos
 RUN npm install
-RUN npx prisma generate
+RUN npx prisma generate --schema=$(find . -name "schema.prisma" | head -n 1)
 RUN npm run build
 
 # 6. Exponemos el puerto que usa la API

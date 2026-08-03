@@ -1,32 +1,28 @@
 # 1. Base Node.js liviana
 FROM node:20-alpine
 
-# 2. Instalamos git y OpenSSL
+# 2. Instalamos git y OpenSSL (imprescindible para Prisma en Alpine)
 RUN apk add --no-cache git openssl
 
-# 3. Clonamos el repositorio
+# 3. Clonamos el repositorio oficial
 RUN git clone https://github.com/EvolutionAPI/evolution-api.git /app
 
 # 4. Nos movemos a la carpeta del proyecto
 WORKDIR /app
 
-# 5. Anclamos a la última versión estable (tag)
-RUN git fetch --tags && \
-    LATEST_TAG=$(git describe --tags $(git rev-list --tags --max-count=1)) && \
-    echo "Anclando en la version estable: $LATEST_TAG" && \
-    git checkout $LATEST_TAG
-
-# 6. Instalamos dependencias
+# 5. Instalamos dependencias
 RUN npm install
 
-# 7. Usamos el script propio del proyecto para generar el cliente de Prisma
-RUN npm run build:prisma || npx prisma generate --schema=./prisma/schema.prisma || true
+# 6. BUSCADOR AUTOMÁTICO: Encuentra la ruta REAL del schema y genera el cliente
+RUN SCHEMA_PATH=$(find /app -name "*.prisma" -print -quit) && \
+    echo ">>> Archivo schema encontrado en: $SCHEMA_PATH" && \
+    npx prisma generate --schema="$SCHEMA_PATH"
 
-# 8. Construimos la aplicación
+# 7. Construimos la aplicación
 RUN npm run build
 
-# 9. Exponemos el puerto
+# 8. Exponemos el puerto oficial
 EXPOSE 8080
 
-# 10. Encendemos la API
+# 9. Comando de arranque
 CMD ["npm", "run", "start:prod"]

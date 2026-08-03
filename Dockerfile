@@ -1,1 +1,1 @@
-FROM evolutionapi/evolution-api:latest
+FROM ghcr.io/evolutionapi/evolution-api:latest

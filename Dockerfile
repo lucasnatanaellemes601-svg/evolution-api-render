@@ -1,1 +1,1 @@
-FROM atendai/evolution-api:v1.7.3
+FROM ghcr.io/evolutionapi/evolution-api:v2.2.0
